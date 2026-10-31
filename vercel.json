@@ -1,17 +1,31 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "services": {
-    "frontend": {
-      "root": "ecovision-ai/frontend"
-    },
     "backend": {
       "root": "ecovision-ai/backend",
+      "framework": "fastapi",
       "entrypoint": "main:app"
+    },
+    "frontend": {
+      "root": "ecovision-ai/frontend",
+      "framework": "vite"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/docs",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/openapi.json",
       "destination": {
         "service": "backend"
       }
