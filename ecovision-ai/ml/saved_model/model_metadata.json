@@ -1,0 +1,65 @@
+{
+  "model_name": "EcoVision_Neural_Classifier",
+  "version": "1.0.0-mobilenetv2",
+  "classes": [
+    "Cardboard",
+    "Glass",
+    "Metal",
+    "Organic",
+    "Paper",
+    "Plastic",
+    "Trash"
+  ],
+  "input_shape": [
+    224,
+    224,
+    3
+  ],
+  "final_val_accuracy": 0.9524,
+  "overall_test_accuracy": 0.9048,
+  "total_test_samples": 84,
+  "metrics": {
+    "Cardboard": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 12.0
+    },
+    "Glass": {
+      "precision": 1.0,
+      "recall": 0.417,
+      "f1_score": 0.588,
+      "support": 12.0
+    },
+    "Metal": {
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1_score": 0.889,
+      "support": 12.0
+    },
+    "Organic": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 12.0
+    },
+    "Paper": {
+      "precision": 1.0,
+      "recall": 0.917,
+      "f1_score": 0.957,
+      "support": 12.0
+    },
+    "Plastic": {
+      "precision": 0.706,
+      "recall": 1.0,
+      "f1_score": 0.828,
+      "support": 12.0
+    },
+    "Trash": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 12.0
+    }
+  }
+}

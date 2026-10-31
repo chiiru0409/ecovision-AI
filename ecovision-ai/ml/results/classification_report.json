@@ -1,0 +1,68 @@
+{
+  "Cardboard": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 12.0
+  },
+  "Glass": {
+    "precision": 1.0,
+    "recall": 0.4166666666666667,
+    "f1-score": 0.5882352941176471,
+    "support": 12.0
+  },
+  "Metal": {
+    "precision": 0.8,
+    "recall": 1.0,
+    "f1-score": 0.8888888888888888,
+    "support": 12.0
+  },
+  "Organic": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 12.0
+  },
+  "Paper": {
+    "precision": 1.0,
+    "recall": 0.9166666666666666,
+    "f1-score": 0.9565217391304348,
+    "support": 12.0
+  },
+  "Plastic": {
+    "precision": 0.7058823529411765,
+    "recall": 1.0,
+    "f1-score": 0.8275862068965517,
+    "support": 12.0
+  },
+  "Trash": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 12.0
+  },
+  "accuracy": 0.9047619047619048,
+  "macro avg": {
+    "precision": 0.9294117647058824,
+    "recall": 0.9047619047619049,
+    "f1-score": 0.8944617327190746,
+    "support": 84.0
+  },
+  "weighted avg": {
+    "precision": 0.9294117647058824,
+    "recall": 0.9047619047619048,
+    "f1-score": 0.8944617327190747,
+    "support": 84.0
+  },
+  "overall_test_accuracy": 0.9048,
+  "total_test_samples": 84,
+  "classes": [
+    "Cardboard",
+    "Glass",
+    "Metal",
+    "Organic",
+    "Paper",
+    "Plastic",
+    "Trash"
+  ]
+}

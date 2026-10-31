@@ -1,0 +1,9 @@
+{
+  "Cardboard": 0,
+  "Glass": 1,
+  "Metal": 2,
+  "Organic": 3,
+  "Paper": 4,
+  "Plastic": 5,
+  "Trash": 6
+}

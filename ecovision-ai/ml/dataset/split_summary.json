@@ -1,0 +1,30 @@
+{
+  "train": {
+    "cardboard": 56,
+    "glass": 56,
+    "metal": 56,
+    "organic": 56,
+    "paper": 56,
+    "plastic": 56,
+    "trash": 56
+  },
+  "val": {
+    "cardboard": 12,
+    "glass": 12,
+    "metal": 12,
+    "organic": 12,
+    "paper": 12,
+    "plastic": 12,
+    "trash": 12
+  },
+  "test": {
+    "cardboard": 12,
+    "glass": 12,
+    "metal": 12,
+    "organic": 12,
+    "paper": 12,
+    "plastic": 12,
+    "trash": 12
+  },
+  "total": 560
+}
