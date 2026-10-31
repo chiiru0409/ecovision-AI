@@ -43,7 +43,11 @@ class Settings:
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
-    SQLITE_PATH: Path = BASE_DIR / "app" / "database" / "ecovision.db"
+    SQLITE_PATH: Path = (
+        Path("/tmp") / "ecovision.db"
+        if os.getenv("VERCEL")
+        else BASE_DIR / "app" / "database" / "ecovision.db"
+    )
 
     # Supported Classes
     SUPPORTED_CLASSES: list[str] = [

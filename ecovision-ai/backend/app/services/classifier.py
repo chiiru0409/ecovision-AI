@@ -53,11 +53,20 @@ class ClassifierService:
         return self._is_loaded
 
     def load_model(self):
-        # 1. Check joblib model
-        joblib_path = Path(__file__).resolve().parent.parent.parent.parent / "ml" / "saved_model" / "ecovision_classifier.joblib"
-        keras_path = Path(settings.MODEL_PATH)
+        # 1. Check joblib model in backend/saved_model or ml/saved_model
+        candidate_paths = [
+            Path(__file__).resolve().parent.parent.parent / "saved_model" / "ecovision_classifier.joblib",
+            Path(__file__).resolve().parent.parent.parent.parent / "ml" / "saved_model" / "ecovision_classifier.joblib",
+            Path(settings.BASE_DIR) / "saved_model" / "ecovision_classifier.joblib"
+        ]
+        
+        joblib_path = None
+        for p in candidate_paths:
+            if p.exists():
+                joblib_path = p
+                break
 
-        if joblib_path.exists():
+        if joblib_path and joblib_path.exists():
             try:
                 self.model = joblib.load(joblib_path)
                 self._is_loaded = True
