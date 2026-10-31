@@ -50,6 +50,8 @@ class ClassifierService:
         self.model_type = "Trained Deep Neural Network"
 
     def is_loaded(self) -> bool:
+        if not self._is_loaded:
+            self.load_model()
         return self._is_loaded
 
     def load_model(self):

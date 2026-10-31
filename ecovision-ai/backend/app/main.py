@@ -58,7 +58,7 @@ app.include_router(history.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(classify.router, prefix="/api")
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {
         "project": settings.PROJECT_NAME,
