@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, Date, cast
 from app.database.models import Classification, CategoryInformation
 from app.database.session import SessionLocal
 from app.config import settings
@@ -131,10 +131,11 @@ class StorageService:
             ).limit(10).all()
 
             # Daily trends (grouped by date)
+            date_col = cast(Classification.created_at, Date)
             trend_rows = db.query(
-                func.date(Classification.created_at).label("date"),
+                date_col.label("date"),
                 func.count(Classification.id).label("count")
-            ).group_by(func.date(Classification.created_at)).order_by(desc("date")).limit(14).all()
+            ).group_by(date_col).order_by(desc("date")).limit(14).all()
 
             daily_trends = [
                 {"date": str(r.date), "count": r.count}

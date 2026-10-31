@@ -51,15 +51,22 @@ class ClassifierService:
 
     def is_loaded(self) -> bool:
         if not self._is_loaded:
-            self.load_model()
+            try:
+                self.load_model()
+            except Exception as e:
+                logger.error(f"Error loading model during check: {e}")
         return self._is_loaded
 
     def load_model(self):
-        # 1. Check joblib model in backend/saved_model or ml/saved_model
+        # 1. Check joblib model across all potential root and nested directories
         candidate_paths = [
             Path(__file__).resolve().parent.parent.parent / "saved_model" / "ecovision_classifier.joblib",
             Path(__file__).resolve().parent.parent.parent.parent / "ml" / "saved_model" / "ecovision_classifier.joblib",
-            Path(settings.BASE_DIR) / "saved_model" / "ecovision_classifier.joblib"
+            Path(__file__).resolve().parent.parent.parent.parent / "backend" / "saved_model" / "ecovision_classifier.joblib",
+            Path(settings.BASE_DIR) / "saved_model" / "ecovision_classifier.joblib",
+            Path.cwd() / "ecovision-ai" / "backend" / "saved_model" / "ecovision_classifier.joblib",
+            Path.cwd() / "backend" / "saved_model" / "ecovision_classifier.joblib",
+            Path.cwd() / "saved_model" / "ecovision_classifier.joblib",
         ]
         
         joblib_path = None
@@ -77,17 +84,21 @@ class ClassifierService:
             except Exception as e:
                 logger.warning(f"Could not load joblib model: {e}")
 
-        # 2. Check TensorFlow model if available
-        if not self._is_loaded and keras_path.exists():
-            try:
-                import tensorflow as tf
-                from tensorflow import keras
-                self.model = keras.models.load_model(str(keras_path))
-                self._is_loaded = True
-                self.model_type = "EcoVision MobileNetV2 Keras Model"
-                logger.info(f"Loaded Keras model from {keras_path}")
-            except Exception as e:
-                logger.warning(f"Could not load Keras model: {e}")
+        # 2. Check TensorFlow/Keras model if available
+        try:
+            keras_path = Path(settings.MODEL_PATH)
+            if not self._is_loaded and keras_path.exists():
+                try:
+                    import tensorflow as tf
+                    from tensorflow import keras
+                    self.model = keras.models.load_model(str(keras_path))
+                    self._is_loaded = True
+                    self.model_type = "EcoVision MobileNetV2 Keras Model"
+                    logger.info(f"Loaded Keras model from {keras_path}")
+                except Exception as e:
+                    logger.warning(f"Could not load Keras model: {e}")
+        except Exception as e:
+            logger.warning(f"Error checking Keras model path: {e}")
 
         self.index_to_class = {i: c for i, c in enumerate(CLASSES)}
 

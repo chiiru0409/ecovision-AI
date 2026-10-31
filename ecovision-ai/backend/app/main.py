@@ -1,8 +1,11 @@
 import logging
+from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.config import settings
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from app.config import settings, ROOT_DIR, BASE_DIR
 from app.database.session import init_db
 from app.services.classifier import classifier_service
 from app.routes import health, categories, history, analytics, classify
@@ -58,8 +61,7 @@ app.include_router(history.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(classify.router, prefix="/api")
 
-@app.get("/api")
-def root():
+def get_api_info():
     return {
         "project": settings.PROJECT_NAME,
         "version": settings.VERSION,
@@ -74,6 +76,64 @@ def root():
             "model_info": "/api/model-info"
         }
     }
+
+@app.get("/api")
+@app.get("/api/")
+def api_root():
+    return get_api_info()
+
+# Locate frontend dist directory across possible deployment setups
+dist_candidates = [
+    ROOT_DIR / "frontend" / "dist",
+    BASE_DIR.parent / "frontend" / "dist",
+    Path.cwd() / "ecovision-ai" / "frontend" / "dist",
+    Path.cwd() / "frontend" / "dist",
+    Path.cwd() / "dist",
+]
+frontend_dist = None
+for candidate in dist_candidates:
+    if candidate.exists() and (candidate / "index.html").exists():
+        frontend_dist = candidate
+        break
+
+if frontend_dist:
+    logger.info(f"Mounting frontend assets from {frontend_dist}")
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/favicon.svg")
+    def serve_favicon():
+        fav = frontend_dist / "favicon.svg"
+        if fav.exists():
+            return FileResponse(str(fav))
+        raise HTTPException(status_code=404)
+
+    @app.get("/")
+    def serve_root():
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
+        return get_api_info()
+
+    @app.get("/{full_path:path}")
+    def serve_spa(full_path: str):
+        # Exclude reserved API/docs prefixes
+        if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("openapi"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        target = frontend_dist / full_path
+        if target.exists() and target.is_file():
+            return FileResponse(str(target))
+        
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
+        raise HTTPException(status_code=404, detail="Not Found")
+else:
+    @app.get("/")
+    def serve_root_fallback():
+        return get_api_info()
 
 if __name__ == "__main__":
     import uvicorn

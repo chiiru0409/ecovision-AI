@@ -48,3 +48,11 @@ desktop.ini
 # SQLite journals & temp files
 *.db-journal
 *.sqlite3-journal
+
+# ML Datasets
+ecovision-ai/ml/dataset/raw/
+ecovision-ai/ml/dataset/splits/
+**/dataset/raw/
+**/dataset/splits/
+dataset/
+

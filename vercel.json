@@ -1,48 +1,27 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "frontend": {
-      "root": "ecovision-ai/frontend",
-      "framework": "vite",
-      "outputDirectory": "dist",
-      "buildCommand": "npm run build"
-    },
-    "backend": {
-      "root": "ecovision-ai/backend",
-      "framework": "fastapi",
-      "entrypoint": "main:app"
-    }
-  },
+  "buildCommand": "cd ecovision-ai/frontend && npm install && npm run build",
+  "outputDirectory": "ecovision-ai/frontend/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": {
-        "service": "backend"
-      }
+      "destination": "/api/index.py"
     },
     {
       "source": "/api",
-      "destination": {
-        "service": "backend"
-      }
+      "destination": "/api/index.py"
     },
     {
       "source": "/docs",
-      "destination": {
-        "service": "backend"
-      }
+      "destination": "/api/index.py"
     },
     {
       "source": "/openapi.json",
-      "destination": {
-        "service": "backend"
-      }
+      "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
+      "destination": "/index.html"
     }
   ]
 }

@@ -39,10 +39,18 @@ class Settings:
     MODEL_VERSION: str = os.getenv("MODEL_VERSION", "1.0.0-mobilenetv2")
     CONFIDENCE_THRESHOLD: float = float(os.getenv("CONFIDENCE_THRESHOLD", "0.35"))
     
-    # Database Settings (Supabase / SQLite Fallback)
+    # Database Settings (Neon PostgreSQL / Supabase / SQLite Fallback)
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    DATABASE_URL: str = (
+        os.getenv("DATABASE_URL")
+        or os.getenv("POSTGRES_URL")
+        or os.getenv("NEON_DATABASE_URL")
+        or os.getenv("POSTGRESQL_URL")
+        or os.getenv("POSTGRES_PRISMA_URL")
+        or os.getenv("POSTGRES_URL_NON_POOLING")
+        or ""
+    ).strip()
     SQLITE_PATH: Path = (
         Path("/tmp") / "ecovision.db"
         if os.getenv("VERCEL")

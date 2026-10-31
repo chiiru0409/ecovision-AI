@@ -1,0 +1,8 @@
+{
+  "name": "ecovision-ai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd ecovision-ai/frontend && npm install && npm run build"
+  }
+}

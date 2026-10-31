@@ -62,25 +62,65 @@ DEFAULT_CATEGORIES = [
 
 # Database Connection Selection
 def get_engine():
-    if settings.DATABASE_URL:
-        db_url = settings.DATABASE_URL
+    db_url = (settings.DATABASE_URL or "").strip()
+    if db_url:
+        # Standardize postgres:// prefix to postgresql://
         if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql://", 1)
-        logger.info("Connecting to PostgreSQL/Supabase database.")
-        return create_engine(db_url, pool_pre_ping=True)
-    else:
-        # SQLite Fallback
-        settings.SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        sqlite_url = f"sqlite:///{settings.SQLITE_PATH.as_posix()}"
-        logger.info(f"Using SQLite database engine at {sqlite_url}")
-        return create_engine(sqlite_url, connect_args={"check_same_thread": False})
+            db_url = "postgresql://" + db_url[len("postgres://"):]
+        
+        # Ensure sslmode=require for Neon / remote PostgreSQL instances
+        if "sslmode" not in db_url and "sqlite" not in db_url:
+            sep = "&" if "?" in db_url else "?"
+            db_url = f"{db_url}{sep}sslmode=require"
+
+        logger.info(f"Connecting to remote PostgreSQL database ({'Neon/Cloud' if 'neon' in db_url else 'PostgreSQL'}).")
+        
+        # 1. Try standard driver (psycopg2)
+        try:
+            eng = create_engine(
+                db_url,
+                pool_pre_ping=True,
+                pool_recycle=300
+            )
+            logger.info("Created PostgreSQL engine with psycopg2 driver.")
+            return eng
+        except Exception as e:
+            logger.warning(f"Standard PostgreSQL engine failed: {e}. Attempting pg8000 driver...")
+            
+            # 2. Try pure-python pg8000 driver fallback
+            try:
+                if db_url.startswith("postgresql://"):
+                    pg8000_url = "postgresql+pg8000://" + db_url[len("postgresql://"):]
+                else:
+                    pg8000_url = db_url
+                eng = create_engine(
+                    pg8000_url,
+                    pool_pre_ping=True,
+                    pool_recycle=300
+                )
+                logger.info("Created PostgreSQL engine with pg8000 driver.")
+                return eng
+            except Exception as e2:
+                logger.error(f"PostgreSQL pg8000 fallback also failed: {e2}. Falling back to SQLite.")
+
+    # SQLite Fallback
+    settings.SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    sqlite_url = f"sqlite:///{settings.SQLITE_PATH.as_posix()}"
+    logger.info(f"Using SQLite database engine at {sqlite_url}")
+    return create_engine(sqlite_url, connect_args={"check_same_thread": False})
 
 engine = get_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
     """Initializes tables and seeds the 7 default categories."""
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables verified/created.")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {e}")
+        return
+
     db: Session = SessionLocal()
     try:
         for cat in DEFAULT_CATEGORIES:
